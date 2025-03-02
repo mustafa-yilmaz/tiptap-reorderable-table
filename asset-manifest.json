@@ -1,15 +1,15 @@
 {
   "files": {
-    "main.css": "/tiptap-reorderable-table/static/css/main.1fde1aea.css",
-    "main.js": "/tiptap-reorderable-table/static/js/main.1f50e839.js",
+    "main.css": "/tiptap-reorderable-table/static/css/main.f627c030.css",
+    "main.js": "/tiptap-reorderable-table/static/js/main.b69d2ac7.js",
     "static/js/453.23c23dbc.chunk.js": "/tiptap-reorderable-table/static/js/453.23c23dbc.chunk.js",
     "index.html": "/tiptap-reorderable-table/index.html",
-    "main.1fde1aea.css.map": "/tiptap-reorderable-table/static/css/main.1fde1aea.css.map",
-    "main.1f50e839.js.map": "/tiptap-reorderable-table/static/js/main.1f50e839.js.map",
+    "main.f627c030.css.map": "/tiptap-reorderable-table/static/css/main.f627c030.css.map",
+    "main.b69d2ac7.js.map": "/tiptap-reorderable-table/static/js/main.b69d2ac7.js.map",
     "453.23c23dbc.chunk.js.map": "/tiptap-reorderable-table/static/js/453.23c23dbc.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.1fde1aea.css",
-    "static/js/main.1f50e839.js"
+    "static/css/main.f627c030.css",
+    "static/js/main.b69d2ac7.js"
   ]
 }
