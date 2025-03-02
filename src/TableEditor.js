@@ -211,6 +211,30 @@ const TableEditor = () => {
           </div>
           <p className="demo-caption">This animation shows how the reorderable table should function.</p>
         </div>
+        
+        <div className="github-links-section">
+          <h2>Relevant Discussions on GitHub</h2>
+          <ul className="github-links-list">
+            <li>
+              <a 
+                href="http://www.github.com/ueberdosis/tiptap/discussions/6149" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                TipTap Discussion
+              </a>
+            </li>
+            <li>
+              <a 
+                href="http://www.github.com/docmost/docmost/issues/463" 
+                target="_blank" 
+                rel="noopener noreferrer"
+              >
+                Docmost Issue
+              </a>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
   );
