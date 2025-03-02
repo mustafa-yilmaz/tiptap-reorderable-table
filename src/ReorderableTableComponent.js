@@ -1,14 +1,44 @@
 // ReorderableTableComponent.js
-import React, { useState } from "react";
-import { NodeViewWrapper } from "@tiptap/react";
+import React, { useState, useEffect } from "react";
+import { NodeViewWrapper, NodeViewContent } from "@tiptap/react";
+import { Editor, EditorContent } from "@tiptap/react";
+import StarterKit from "@tiptap/starter-kit";
 
-const ReorderableTableComponent = () => {
+const ReorderableTableComponent = ({ editor: parentEditor }) => {
+  // Initialize with 4 rows and 3 columns
   const [rows, setRows] = useState([
     ["Row 1, Col 1", "Row 1, Col 2", "Row 1, Col 3"],
     ["Row 2, Col 1", "Row 2, Col 2", "Row 2, Col 3"],
     ["Row 3, Col 1", "Row 3, Col 2", "Row 3, Col 3"],
     ["Row 4, Col 1", "Row 4, Col 2", "Row 4, Col 3"],
   ]);
+
+  // Create cell editors
+  const [cellEditors, setCellEditors] = useState([]);
+
+  // Initialize cell editors
+  useEffect(() => {
+    const newCellEditors = rows.map(row => 
+      row.map((content, i) => 
+        new Editor({
+          extensions: [StarterKit],
+          content: content,
+          editable: true,
+        })
+      )
+    );
+    
+    setCellEditors(newCellEditors);
+    
+    // Clean up editors on unmount
+    return () => {
+      newCellEditors.forEach(row => 
+        row.forEach(editor => {
+          if (editor) editor.destroy();
+        })
+      );
+    };
+  }, []);
 
   // Move a row up
   const moveRowUp = (index) => {
@@ -19,7 +49,14 @@ const ReorderableTableComponent = () => {
     newRows[index] = newRows[index - 1];
     newRows[index - 1] = temp;
     
+    // Also move the editors
+    const newEditors = [...cellEditors];
+    const tempEditors = newEditors[index];
+    newEditors[index] = newEditors[index - 1];
+    newEditors[index - 1] = tempEditors;
+    
     setRows(newRows);
+    setCellEditors(newEditors);
   };
   
   // Move a row down
@@ -31,7 +68,32 @@ const ReorderableTableComponent = () => {
     newRows[index] = newRows[index + 1];
     newRows[index + 1] = temp;
     
+    // Also move the editors
+    const newEditors = [...cellEditors];
+    const tempEditors = newEditors[index];
+    newEditors[index] = newEditors[index + 1];
+    newEditors[index + 1] = tempEditors;
+    
     setRows(newRows);
+    setCellEditors(newEditors);
+  };
+
+  // Add a new row
+  const addRow = () => {
+    // Add a new row with empty cells
+    const newRow = Array(rows[0].length).fill("");
+    setRows([...rows, newRow]);
+    
+    // Create editors for the new row
+    const newRowEditors = newRow.map(() => 
+      new Editor({
+        extensions: [StarterKit],
+        content: "",
+        editable: true,
+      })
+    );
+    
+    setCellEditors([...cellEditors, newRowEditors]);
   };
 
   return (
@@ -67,15 +129,24 @@ const ReorderableTableComponent = () => {
                     ↓
                   </button>
                 </td>
-                {row.map((cell, cellIndex) => (
-                  <td key={cellIndex} contentEditable="true" suppressContentEditableWarning={true}>
-                    {cell}
+                {cellEditors[rowIndex]?.map((cellEditor, cellIndex) => (
+                  <td key={cellIndex} className="table-cell-editor">
+                    {cellEditor && <EditorContent editor={cellEditor} />}
                   </td>
                 ))}
               </tr>
             ))}
           </tbody>
         </table>
+        <div className="table-actions">
+          <button 
+            className="add-row-button" 
+            onClick={addRow}
+            title="Add new row"
+          >
+            + Add Row
+          </button>
+        </div>
       </div>
     </NodeViewWrapper>
   );

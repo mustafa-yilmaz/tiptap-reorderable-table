@@ -10,7 +10,7 @@ const ReorderableTable = Node.create({
   
   group: 'block',
   
-  content: 'text*',
+  atom: true, // Prevents editing of this node directly
   
   parseHTML() {
     return [
@@ -25,7 +25,10 @@ const ReorderableTable = Node.create({
   },
   
   addNodeView() {
-    return ReactNodeViewRenderer(ReorderableTableComponent);
+    return ReactNodeViewRenderer(ReorderableTableComponent, {
+      as: 'div',
+      className: 'reorderable-table-node',
+    });
   },
 });
 
