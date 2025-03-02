@@ -199,6 +199,18 @@ const TableEditor = () => {
           <p>💡 To reorder rows: First select a row number, then use the "Move Row Up/Down" buttons</p>
           <p>📝 You can also use all the standard TipTap table features (add/remove rows and columns, etc.)</p>
         </div>
+        
+        <div className="demo-section">
+          <h2>The Targeted Example</h2>
+          <div className="demo-gif-container">
+            <img 
+              src={process.env.PUBLIC_URL + '/images/target.gif'} 
+              alt="Reorderable Table Demo" 
+              className="demo-gif"
+            />
+          </div>
+          <p className="demo-caption">This animation shows how the reorderable table should function.</p>
+        </div>
       </div>
     </div>
   );
