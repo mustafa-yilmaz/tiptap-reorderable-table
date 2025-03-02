@@ -1,10 +1,14 @@
 // ReorderableTableComponent.js
-import React, { useState, useEffect } from "react";
-import { NodeViewWrapper, NodeViewContent } from "@tiptap/react";
+import React, { useState, useEffect, useContext } from "react";
+import { NodeViewWrapper } from "@tiptap/react";
 import { Editor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import { ActiveEditorContext } from "./TableEditor";
 
 const ReorderableTableComponent = ({ editor: parentEditor }) => {
+  // Access the active editor context
+  const { setActiveEditor } = useContext(ActiveEditorContext);
+  
   // Initialize with 4 rows and 3 columns
   const [rows, setRows] = useState([
     ["Row 1, Col 1", "Row 1, Col 2", "Row 1, Col 3"],
@@ -19,13 +23,18 @@ const ReorderableTableComponent = ({ editor: parentEditor }) => {
   // Initialize cell editors
   useEffect(() => {
     const newCellEditors = rows.map(row => 
-      row.map((content, i) => 
-        new Editor({
+      row.map((content, i) => {
+        const cellEditor = new Editor({
           extensions: [StarterKit],
           content: content,
           editable: true,
-        })
-      )
+          // When this editor is focused, set it as the active editor
+          onFocus: () => {
+            setActiveEditor(cellEditor);
+          },
+        });
+        return cellEditor;
+      })
     );
     
     setCellEditors(newCellEditors);
@@ -38,7 +47,7 @@ const ReorderableTableComponent = ({ editor: parentEditor }) => {
         })
       );
     };
-  }, []);
+  }, [rows, setActiveEditor]);
 
   // Move a row up
   const moveRowUp = (index) => {
@@ -85,13 +94,17 @@ const ReorderableTableComponent = ({ editor: parentEditor }) => {
     setRows([...rows, newRow]);
     
     // Create editors for the new row
-    const newRowEditors = newRow.map(() => 
-      new Editor({
+    const newRowEditors = newRow.map(() => {
+      const cellEditor = new Editor({
         extensions: [StarterKit],
         content: "",
         editable: true,
-      })
-    );
+        onFocus: () => {
+          setActiveEditor(cellEditor);
+        },
+      });
+      return cellEditor;
+    });
     
     setCellEditors([...cellEditors, newRowEditors]);
   };

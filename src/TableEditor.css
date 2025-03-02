@@ -75,6 +75,13 @@
   color: #4a90e2;
 }
 
+.editor-menu button.is-active {
+  background-color: #e8f4fc;
+  border-color: #4a90e2;
+  color: #4a90e2;
+  font-weight: bold;
+}
+
 /* Custom reorderable table styling within TipTap */
 .reorderable-table-wrapper {
   margin: 20px 0;
