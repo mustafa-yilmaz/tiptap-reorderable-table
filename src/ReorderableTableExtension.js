@@ -4,117 +4,186 @@ import Table from "@tiptap/extension-table";
 import TableRow from "@tiptap/extension-table-row";
 import TableHeader from "@tiptap/extension-table-header";
 import TableCell from "@tiptap/extension-table-cell";
-import { Extension } from "@tiptap/core";
+import { Extension } from '@tiptap/core';
 
-// Create an extension to add the reordering functionality to TipTap's tables
-const TableReordering = Extension.create({
-  name: 'tableReordering',
+// Create custom table row reordering commands
+const TableRowReordering = Extension.create({
+  name: 'tableRowReordering',
 
-  // Add commands that we can call from the editor
   addCommands() {
     return {
-      moveRowUp: (pos) => ({ tr, dispatch, state }) => {
-        // Find the table node and get its position
-        const { doc } = state;
-        const resolvedPos = state.doc.resolve(pos);
-        const tablePos = resolvedPos.before(1);
-        const table = doc.nodeAt(tablePos);
-        
-        if (!table || table.type.name !== 'table') return false;
-        
-        // Find the current row position
-        const rowPos = resolvedPos.before(2);
-        const index = state.doc.resolve(rowPos).index(resolvedPos.depth - 1);
-        
-        if (index <= 0) return false; // Can't move first row up
-        
-        // Move the row up by reordering the rows
-        if (dispatch) {
-          const rows = table.content.content;
-          const newRows = Array.from(rows);
-          const temp = newRows[index];
-          newRows[index] = newRows[index - 1];
-          newRows[index - 1] = temp;
+      customMoveRowUp: () => ({ tr, state, dispatch, view }) => {
+        try {
+          // Find the selected row in the DOM
+          const selectedRow = view.dom.querySelector('tr.row-selected');
+          if (!selectedRow || !selectedRow.closest('tbody')) return false;
           
-          // Create a new table with the reordered rows
-          const newTable = table.type.create(table.attrs, newRows);
+          // Get the position of this row in the DOM
+          const tbodyElement = selectedRow.closest('tbody');
+          const rows = Array.from(tbodyElement.querySelectorAll('tr'));
+          const rowIndex = rows.indexOf(selectedRow);
           
-          // Replace the old table with the new one
-          tr.replaceWith(tablePos, tablePos + table.nodeSize, newTable);
-          dispatch(tr);
+          if (rowIndex <= 0) return false; // Can't move up the first row
+          
+          // Find table position in ProseMirror document
+          let tablePos = null;
+          let tableNode = null;
+          
+          state.doc.descendants((node, pos) => {
+            if (tablePos !== null) return false; // Already found the table
+            if (node.type.name === 'table') {
+              tablePos = pos;
+              tableNode = node;
+              return false;
+            }
+          });
+          
+          if (!tablePos || !tableNode) return false;
+          
+          // Get tbody node
+          const tbodyNode = tableNode.firstChild;
+          if (!tbodyNode) return false;
+          
+          // Get the two rows to swap
+          const rowToMove = tbodyNode.child(rowIndex);
+          const targetRow = tbodyNode.child(rowIndex - 1);
+          
+          if (!rowToMove || !targetRow) return false;
+          
+          // Calculate positions
+          let pos = tablePos + 1; // +1 for table start
+          
+          // Skip to the rowToMove position
+          for (let i = 0; i < rowIndex; i++) {
+            pos += tbodyNode.child(i).nodeSize;
+          }
+          
+          const rowToMovePos = pos;
+          const targetRowPos = rowToMovePos - targetRow.nodeSize;
+          
+          if (dispatch) {
+            // Delete the row we want to move
+            let newTr = tr.delete(rowToMovePos, rowToMovePos + rowToMove.nodeSize);
+            
+            // Insert it at the target position
+            newTr = newTr.insert(targetRowPos, rowToMove);
+            
+            dispatch(newTr);
+            
+            // Re-apply the row selection class after DOM update
+            setTimeout(() => {
+              const rows = view.dom.querySelectorAll('tbody tr');
+              if (rows[rowIndex - 1]) {
+                const newSelectedRow = rows[rowIndex - 1];
+                // Clear all selections
+                view.dom.querySelectorAll('tr.row-selected').forEach(r => {
+                  r.classList.remove('row-selected');
+                });
+                // Select the moved row
+                newSelectedRow.classList.add('row-selected');
+              }
+            }, 10);
+          }
+          
+          return true;
+        } catch (error) {
+          console.error("Error in customMoveRowUp:", error);
+          return false;
         }
-        
-        return true;
       },
       
-      moveRowDown: (pos) => ({ tr, dispatch, state }) => {
-        // Find the table node and get its position
-        const { doc } = state;
-        const resolvedPos = state.doc.resolve(pos);
-        const tablePos = resolvedPos.before(1);
-        const table = doc.nodeAt(tablePos);
-        
-        if (!table || table.type.name !== 'table') return false;
-        
-        // Find the current row position
-        const rowPos = resolvedPos.before(2);
-        const index = state.doc.resolve(rowPos).index(resolvedPos.depth - 1);
-        
-        if (index >= table.content.childCount - 1) return false; // Can't move last row down
-        
-        // Move the row down by reordering the rows
-        if (dispatch) {
-          const rows = table.content.content;
-          const newRows = Array.from(rows);
-          const temp = newRows[index];
-          newRows[index] = newRows[index + 1];
-          newRows[index + 1] = temp;
+      customMoveRowDown: () => ({ tr, state, dispatch, view }) => {
+        try {
+          // Find the selected row in the DOM
+          const selectedRow = view.dom.querySelector('tr.row-selected');
+          if (!selectedRow || !selectedRow.closest('tbody')) return false;
           
-          // Create a new table with the reordered rows
-          const newTable = table.type.create(table.attrs, newRows);
+          // Get the position of this row in the DOM
+          const tbodyElement = selectedRow.closest('tbody');
+          const rows = Array.from(tbodyElement.querySelectorAll('tr'));
+          const rowIndex = rows.indexOf(selectedRow);
           
-          // Replace the old table with the new one
-          tr.replaceWith(tablePos, tablePos + table.nodeSize, newTable);
-          dispatch(tr);
+          if (rowIndex === -1 || rowIndex >= rows.length - 1) return false; // Can't move down the last row
+          
+          // Find table position in ProseMirror document
+          let tablePos = null;
+          let tableNode = null;
+          
+          state.doc.descendants((node, pos) => {
+            if (tablePos !== null) return false; // Already found the table
+            if (node.type.name === 'table') {
+              tablePos = pos;
+              tableNode = node;
+              return false;
+            }
+          });
+          
+          if (!tablePos || !tableNode) return false;
+          
+          // Get tbody node
+          const tbodyNode = tableNode.firstChild;
+          if (!tbodyNode) return false;
+          
+          // Get the two rows to swap
+          const rowToMove = tbodyNode.child(rowIndex);
+          const targetRow = tbodyNode.child(rowIndex + 1);
+          
+          if (!rowToMove || !targetRow) return false;
+          
+          // Calculate positions
+          let pos = tablePos + 1; // +1 for table start
+          
+          // Skip to the rowToMove position
+          for (let i = 0; i < rowIndex; i++) {
+            pos += tbodyNode.child(i).nodeSize;
+          }
+          
+          const rowToMovePos = pos;
+          const targetRowPos = rowToMovePos + rowToMove.nodeSize;
+          
+          if (dispatch) {
+            // Delete the row we want to move
+            let newTr = tr.delete(rowToMovePos, rowToMovePos + rowToMove.nodeSize);
+            
+            // Insert it after the target position
+            newTr = newTr.insert(targetRowPos, rowToMove);
+            
+            dispatch(newTr);
+            
+            // Re-apply the row selection class after DOM update
+            setTimeout(() => {
+              const rows = view.dom.querySelectorAll('tbody tr');
+              if (rows[rowIndex + 1]) {
+                const newSelectedRow = rows[rowIndex + 1];
+                // Clear all selections
+                view.dom.querySelectorAll('tr.row-selected').forEach(r => {
+                  r.classList.remove('row-selected');
+                });
+                // Select the moved row
+                newSelectedRow.classList.add('row-selected');
+              }
+            }, 10);
+          }
+          
+          return true;
+        } catch (error) {
+          console.error("Error in customMoveRowDown:", error);
+          return false;
         }
-        
-        return true;
       }
     };
-  },
-  
-  // Add a button next to each row to move it up or down
-  addProseMirrorPlugins() {
-    return [
-      {
-        // This plugin adds UI controls to table rows
-        props: {
-          decorations: (state) => {
-            // Find all tables in the document and add controls for reordering
-            // This is a placeholder for the actual implementation
-            return null;
-          }
-        }
-      }
-    ];
   }
 });
 
-// Export the standard TipTap table extensions with our reordering extension
+// Make sure we have all the required extensions
 export const TableExtensions = [
   StarterKit,
   Table.configure({
     resizable: true,
-    HTMLAttributes: {
-      class: 'reorderable-table',
-    },
+    allowTableNodeSelection: true,
   }),
-  TableRow.configure({
-    HTMLAttributes: {
-      class: 'reorderable-row',
-    },
-  }),
+  TableRow,
   TableHeader,
   TableCell,
-  TableReordering, // Our extension that adds reordering functionality
+  TableRowReordering, // Add our custom extension
 ];

@@ -27,6 +27,17 @@
   min-height: 300px;
 }
 
+.loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 300px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #f9f9f9;
+  color: #666;
+}
+
 /* Style the editor's content */
 .visible-tiptap-editor .ProseMirror {
   outline: none;
@@ -82,97 +93,7 @@
   font-weight: bold;
 }
 
-/* Custom reorderable table styling within TipTap */
-.reorderable-table-wrapper {
-  margin: 20px 0;
-}
-
-.reorderable-table-container {
-  border: 1px solid #e0e0e0;
-  border-radius: 4px;
-  overflow: hidden;
-  margin: 10px 0;
-}
-
-.reorderable-table {
-  width: 100%;
-  border-collapse: collapse;
-  background-color: white;
-}
-
-.reorderable-table th, 
-.reorderable-table td {
-  padding: 10px;
-  border: 1px solid #e0e0e0;
-  text-align: left;
-}
-
-.reorderable-table th {
-  background-color: #f5f5f5;
-  font-weight: 600;
-}
-
-/* Controls column */
-.controls-column {
-  width: 80px;
-  text-align: center;
-}
-
-.controls-cell {
-  text-align: center;
-  white-space: nowrap;
-  background-color: #f9f9f9;
-}
-
-/* Move buttons */
-.move-button {
-  width: 30px;
-  height: 30px;
-  margin: 0 2px;
-  border: 1px solid #ddd;
-  background-color: white;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s;
-}
-
-.move-button:hover:not(:disabled) {
-  background-color: #f0f7ff;
-  border-color: #4a90e2;
-  color: #4a90e2;
-}
-
-.move-button:active:not(:disabled) {
-  background-color: #e6f0ff;
-  transform: translateY(1px);
-}
-
-.move-button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-}
-
-/* Row hover effect */
-.reorderable-table tbody tr:hover {
-  background-color: #f5f5f5;
-}
-
-/* Table cell editor */
-.table-cell-editor {
-  padding: 0 !important;
-}
-
-.table-cell-editor .ProseMirror {
-  padding: 10px;
-  min-height: 30px;
-  outline: none;
-}
-
-/* Add row button */
+/* Table buttons styling */
 .table-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -200,47 +121,119 @@
   color: #4a90e2;
 }
 
-/* Row controls styling */
-.row-controls {
-  position: absolute;
-  right: -45px;
-  top: 50%;
-  transform: translateY(-50%);
+/* Row reordering controls */
+.row-reordering-controls {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #e8f4fc;
+  border-radius: 4px;
+  border: 1px solid #c5e1f9;
 }
 
-.row-control {
-  width: 24px;
-  height: 24px;
-  border-radius: 3px;
-  border: 1px solid #ddd;
+.row-control-button {
   background-color: white;
-  color: #666;
-  font-size: 12px;
+  border: 1px solid #4a90e2;
+  border-radius: 4px;
+  padding: 8px 15px;
+  font-size: 14px;
+  color: #4a90e2;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
   display: flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
+}
+
+.row-control-button:hover {
+  background-color: #4a90e2;
+  color: white;
+}
+
+.row-control-button:active {
+  transform: translateY(1px);
+}
+
+/* Row selection info */
+.row-selection-info {
+  margin: 10px 0;
+  padding: 8px;
+  background-color: #f5f7fa;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #4a5568;
+  text-align: center;
+  border: 1px solid #e2e8f0;
+}
+
+/* Row selection area */
+.row-selection-options {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.row-selection-info {
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.row-selection-info p {
+  margin: 0;
+  font-size: 14px;
+  color: #4a5568;
+}
+
+/* Row selection buttons */
+.row-selection-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+}
+
+.row-select-button {
+  padding: 6px 12px;
+  font-size: 14px;
+  background-color: white;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  color: #4a5568;
   cursor: pointer;
   transition: all 0.2s;
 }
 
-.row-control:hover {
-  background-color: #e8f4fc;
+.row-select-button:hover {
+  background-color: #f0f7ff;
   border-color: #4a90e2;
   color: #4a90e2;
+}
+
+.row-select-button.selected {
+  background-color: #4a90e2;
+  border-color: #2a6dc0;
+  color: white;
+  font-weight: 600;
+}
+
+/* Row hover and selection effects */
+.ProseMirror tr {
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.ProseMirror tr:hover {
+  background-color: #f7fbff;
 }
 
 /* Position the table to allow space for controls */
 .visible-tiptap-editor table {
   position: relative;
-  margin-right: 45px !important;
-}
-
-/* Table row highlight on hover */
-.visible-tiptap-editor tr:hover {
-  background-color: #f5f9ff;
 }
 
 /* Paragraph styling */
