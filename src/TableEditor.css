@@ -1,157 +1,199 @@
 .editor-container {
-    max-width: 800px;
-    margin: 20px auto;
+  max-width: 800px;
+  margin: 20px auto;
+}
+
+/* TipTap editor container */
+.visible-tiptap-container {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.visible-tiptap-container h2 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 1.5em;
+}
+
+/* Make the editor visible and stylish */
+.visible-tiptap-editor {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 12px;
+  min-height: 300px;
+}
+
+/* Style the editor's content */
+.visible-tiptap-editor .ProseMirror {
+  outline: none;
+  min-height: 200px;
+}
+
+/* Table styles within TipTap */
+.visible-tiptap-editor table {
+  border-collapse: collapse;
+  width: 100%;
+  margin-bottom: 1em;
+  table-layout: fixed;
+}
+
+.visible-tiptap-editor td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  min-width: 100px;
+  position: relative;
+}
+
+/* Editor menu styling */
+.editor-menu {
+  margin-bottom: 15px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.editor-menu button {
+  background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.editor-menu button:hover {
+  background-color: #f0f7ff;
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+/* Custom reorderable table styling within TipTap */
+.reorderable-table-wrapper {
+  margin: 20px 0;
+}
+
+.reorderable-table-container {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0;
+}
+
+.reorderable-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+}
+
+.reorderable-table th, 
+.reorderable-table td {
+  padding: 10px;
+  border: 1px solid #e0e0e0;
+  text-align: left;
+}
+
+.reorderable-table th {
+  background-color: #f5f5f5;
+  font-weight: 600;
+}
+
+/* Controls column */
+.controls-column {
+  width: 80px;
+  text-align: center;
+}
+
+.controls-cell {
+  text-align: center;
+  white-space: nowrap;
+  background-color: #f9f9f9;
+}
+
+/* Move buttons */
+.move-button {
+  width: 30px;
+  height: 30px;
+  margin: 0 2px;
+  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.move-button:hover:not(:disabled) {
+  background-color: #f0f7ff;
+  border-color: #4a90e2;
+  color: #4a90e2;
+}
+
+.move-button:active:not(:disabled) {
+  background-color: #e6f0ff;
+  transform: translateY(1px);
+}
+
+.move-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Row hover effect */
+.reorderable-table tbody tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* Paragraph styling */
+.visible-tiptap-editor p {
+  margin-bottom: 1em;
+  line-height: 1.5;
+}
+
+/* Instructions */
+.editor-info {
+  margin-top: 15px;
+  padding: 10px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 14px;
+  color: #555;
+}
+
+.editor-info p {
+  margin: 0;
+}
+
+/* Focus styles */
+.visible-tiptap-editor .ProseMirror:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.1);
+}
+
+/* Responsive design */
+@media (max-width: 600px) {
+  .visible-tiptap-container {
+    padding: 15px;
   }
   
-  /* Hide the TipTap editor but keep it in the DOM */
-  .hidden-editor {
-    position: absolute;
-    opacity: 0;
-    height: 0;
-    overflow: hidden;
-    pointer-events: none;
+  .visible-tiptap-editor {
+    padding: 8px;
   }
   
-  /* Main reorderable table container */
-  .reorderable-table-container {
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 20px;
-    background: white;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-  
-  .reorderable-table-container h2 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    color: #333;
-    font-size: 1.5em;
-  }
-  
-  /* Table styles */
-  .table-container {
+  .visible-tiptap-editor table {
     width: 100%;
     overflow-x: auto;
+    display: block;
   }
-  
-  .reorderable-table {
-    width: 100%;
-    border-collapse: collapse;
-  }
-  
-  .reorderable-rows {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .reorderable-row {
-    display: flex;
-    border: 1px solid #ddd;
-    margin-bottom: 8px;
-    background: white;
-    border-radius: 3px;
-    overflow: hidden;
-    position: relative;
-    transition: box-shadow 0.2s ease;
-  }
-  
-  .reorderable-row:hover {
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-  }
-  
-  .drag-handle {
-    width: 30px;
-    background: #f0f0f0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: grab;
-    font-size: 16px;
-    user-select: none;
-    color: #666;
-    transition: background 0.2s;
-  }
-  
-  .drag-handle:hover {
-    background: #e0e0e0;
-    color: #333;
-  }
-  
-  .drag-handle:active {
-    cursor: grabbing;
-    background: #d0d0d0;
-  }
-  
-  .row-content {
-    display: flex;
-    flex: 1;
-  }
-  
-  .cell {
-    flex: 1;
-    padding: 12px;
-    border-right: 1px solid #eee;
-    min-height: 20px;
-    outline: none;
-  }
-  
-  .cell:focus {
-    background-color: #f8f9fa;
-    box-shadow: inset 0 0 0 2px #4a90e2;
-  }
-  
-  .cell:last-child {
-    border-right: none;
-  }
-  
-  /* Sortable classes */
-  .sortable-ghost {
-    opacity: 0.5;
-    background: #f9f9f9 !important;
-    border: 2px dashed #aaa !important;
-  }
-  
-  .sortable-chosen {
-    background: #f0f7ff !important;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1) !important;
-    z-index: 10;
-  }
-  
-  .sortable-drag {
-    background: white !important;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15) !important;
-    border: 1px solid #ccc !important;
-    opacity: 0.9;
-  }
-  
-  /* Add header row styling */
-  .reorderable-row:first-child {
-    background: #f5f5f5;
-    font-weight: bold;
-  }
-  
-  /* Add some responsive design */
-  @media (max-width: 600px) {
-    .reorderable-row {
-      flex-direction: column;
-    }
-    
-    .row-content {
-      flex-direction: column;
-    }
-    
-    .drag-handle {
-      width: 100%;
-      height: 24px;
-    }
-    
-    .cell {
-      border-right: none;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .cell:last-child {
-      border-bottom: none;
-    }
-  }
+}

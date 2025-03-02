@@ -1,50 +1,35 @@
+// ReorderableTableExtension.js
 import StarterKit from "@tiptap/starter-kit";
-import Table from "@tiptap/extension-table";
-import TableRow from "@tiptap/extension-table-row";
-import TableHeader from "@tiptap/extension-table-header";
-import TableCell from "@tiptap/extension-table-cell";
-import { Extension } from "@tiptap/core";
+import { Node } from "@tiptap/core";
+import { ReactNodeViewRenderer } from "@tiptap/react";
+import ReorderableTableComponent from "./ReorderableTableComponent";
 
-// Create a custom extension to add special attributes to table rows
-const DraggableTableRowAttributes = Extension.create({
-  name: 'draggableTableRowAttributes',
+// Custom node for the reorderable table
+const ReorderableTable = Node.create({
+  name: 'reorderableTable',
   
-  addGlobalAttributes() {
+  group: 'block',
+  
+  content: 'text*',
+  
+  parseHTML() {
     return [
       {
-        types: ['tableRow'],
-        attributes: {
-          draggable: {
-            default: 'true',
-            parseHTML: element => element.getAttribute('draggable') || 'true',
-            renderHTML: attributes => {
-              return {
-                draggable: attributes.draggable,
-                'data-sortable-row': 'true',
-                'data-sortable-id': Math.random().toString(36).substr(2, 9) // Add a unique ID to each row
-              };
-            },
-          },
-        },
+        tag: 'div[data-type="reorderable-table"]',
       },
     ];
+  },
+  
+  renderHTML({ HTMLAttributes }) {
+    return ['div', { 'data-type': 'reorderable-table', ...HTMLAttributes }, 0];
+  },
+  
+  addNodeView() {
+    return ReactNodeViewRenderer(ReorderableTableComponent);
   },
 });
 
 export const TableExtensions = [
   StarterKit,
-  Table.configure({
-    resizable: true,
-    HTMLAttributes: {
-      class: 'reorderable-table',
-    },
-  }),
-  TableRow.configure({
-    HTMLAttributes: {
-      class: 'sortable-row',
-    },
-  }),
-  TableHeader,
-  TableCell,
-  DraggableTableRowAttributes,
+  ReorderableTable,
 ];

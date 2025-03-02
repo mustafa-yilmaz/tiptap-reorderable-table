@@ -1,165 +1,54 @@
-import React, { useEffect, useRef, useState } from "react";
+// TableEditor.js
+import React from "react";
 import { useEditor, EditorContent } from "@tiptap/react";
 import { TableExtensions } from "./ReorderableTableExtension";
 import "./TableEditor.css";
-import Sortable from "sortablejs";
 
 const TableEditor = () => {
-  // We still use TipTap editor in the background, but don't display it
   const editor = useEditor({
     extensions: TableExtensions,
     content: `
-      <table>
-        <tbody>
-          <tr><td>Row 1, Col 1</td><td>Row 1, Col 2</td></tr>
-          <tr><td>Row 2, Col 1</td><td>Row 2, Col 2</td></tr>
-          <tr><td>Row 3, Col 1</td><td>Row 3, Col 2</td></tr>
-        </tbody>
-      </table>
+      <h3>TipTap Editor with Reorderable Table</h3>
+      <p>This is a fully editable rich text editor with a custom reorderable table component.</p>
+      <div data-type="reorderable-table"></div>
+      <p>You can add text before and after the table. The table is a special component inside the editor.</p>
+      <p>Use the arrow buttons to reorder rows in the table!</p>
     `,
-    onUpdate: ({ editor }) => {
-      // When the editor content changes, update our representation of the table
-      updateTableData();
-    }
+    editable: true,
   });
-
-  // State to track table data
-  const [tableData, setTableData] = useState([
-    ["Row 1, Col 1", "Row 1, Col 2"],
-    ["Row 2, Col 1", "Row 2, Col 2"],
-    ["Row 3, Col 1", "Row 3, Col 2"]
-  ]);
-
-  // Reference to the drag container
-  const dragContainerRef = useRef(null);
-  const hiddenEditorRef = useRef(null);
   
-  // Extract table data from the editor
-  const updateTableData = () => {
-    if (!editor) return;
-    
-    try {
-      const dom = new DOMParser().parseFromString(
-        editor.getHTML(),
-        'text/html'
-      );
-      
-      const rows = dom.querySelectorAll('tbody tr');
-      const newData = [];
-      
-      rows.forEach(row => {
-        const cells = row.querySelectorAll('td');
-        const rowData = [];
-        
-        cells.forEach(cell => {
-          rowData.push(cell.innerHTML);
-        });
-        
-        if (rowData.length > 0) {
-          newData.push(rowData);
-        }
-      });
-      
-      if (newData.length > 0) {
-        setTableData(newData);
-      }
-    } catch (error) {
-      console.error("Error extracting table data:", error);
-    }
+  // Add a button to insert the reorderable table
+  const addReorderableTable = () => {
+    editor.chain().focus().insertContent({
+      type: 'reorderableTable',
+    }).run();
   };
-  
-  // Apply table data back to the editor
-  const applyTableDataToEditor = () => {
-    if (!editor) return;
-    
-    const tableHtml = `
-      <table>
-        <tbody>
-          ${tableData.map(row => `
-            <tr>
-              ${row.map(cell => `<td>${cell}</td>`).join('')}
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    `;
-    
-    editor.commands.setContent(tableHtml);
-  };
-  
-  // Initialize Sortable when component mounts
-  useEffect(() => {
-    if (!dragContainerRef.current) return;
-    
-    const sortable = new Sortable(dragContainerRef.current, {
-      animation: 150,
-      handle: '.drag-handle',
-      ghostClass: 'sortable-ghost',
-      chosenClass: 'sortable-chosen',
-      dragClass: 'sortable-drag',
-      onEnd: (evt) => {
-        // Update tableData after row reordering
-        const newData = [...tableData];
-        const [movedItem] = newData.splice(evt.oldIndex, 1);
-        newData.splice(evt.newIndex, 0, movedItem);
-        setTableData(newData);
-        
-        // Apply changes to the editor
-        setTimeout(() => {
-          applyTableDataToEditor();
-        }, 50);
-      }
-    });
-    
-    return () => {
-      sortable.destroy();
-    };
-  }, [tableData]);
-  
-  // Extract table data from editor when it's ready
-  useEffect(() => {
-    if (editor) {
-      updateTableData();
-    }
-  }, [editor]);
+
+  if (!editor) {
+    return <div>Loading editor...</div>;
+  }
 
   return (
     <div className="editor-container">
-      {/* Hidden TipTap editor - we keep this for data management but don't display it */}
-      <div className="hidden-editor" ref={hiddenEditorRef}>
-        <EditorContent editor={editor} />
-      </div>
-      
-      {/* Only the draggable representation is shown */}
-      <div className="reorderable-table-container">
-        <h2>Sample Table</h2>
-        <div className="table-container">
-          <div className="reorderable-table">
-            <div className="reorderable-rows" ref={dragContainerRef}>
-              {tableData.map((row, rowIndex) => (
-                <div key={rowIndex} className="reorderable-row">
-                  <div className="drag-handle">⋮⋮</div>
-                  <div className="row-content">
-                    {row.map((cell, cellIndex) => (
-                      <div 
-                        key={cellIndex} 
-                        className="cell" 
-                        contentEditable={true}
-                        dangerouslySetInnerHTML={{ __html: cell }}
-                        onBlur={(e) => {
-                          // Update the cell content when it's edited
-                          const newData = [...tableData];
-                          newData[rowIndex][cellIndex] = e.target.innerHTML;
-                          setTableData(newData);
-                          applyTableDataToEditor();
-                        }}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+      <div className="visible-tiptap-container">
+        <h2>TipTap Editor with Reorderable Table</h2>
+        
+        <div className="editor-menu">
+          <button onClick={() => editor.chain().focus().toggleBold().run()}>
+            Bold
+          </button>
+          <button onClick={() => editor.chain().focus().toggleItalic().run()}>
+            Italic
+          </button>
+          <button onClick={addReorderableTable}>
+            Insert Reorderable Table
+          </button>
+        </div>
+        
+        <EditorContent editor={editor} className="visible-tiptap-editor" />
+        
+        <div className="editor-info">
+          <p>↕️ Use the arrow buttons to reorder rows in the table</p>
         </div>
       </div>
     </div>
